@@ -18,11 +18,13 @@ import { GoogleGmailAuthController } from 'src/core/auth/controllers/google-gmai
 import { VerifyAuthController } from 'src/core/auth/controllers/verify-auth.controller';
 import { TokenService } from 'src/core/auth/services/token.service';
 import { GoogleGmailService } from 'src/core/auth/services/google-gmail.service';
+import { OauthController } from 'src/core/auth/controllers/oauth.controller';
 
 import { AuthResolver } from './auth.resolver';
 
 import { JwtAuthStrategy } from './strategies/jwt.auth.strategy';
 import { AuthService } from './services/auth.service';
+
 const jwtModule = JwtModule.registerAsync({
   useFactory: async (environmentService: EnvironmentService) => {
     return {
@@ -50,6 +52,7 @@ const jwtModule = JwtModule.registerAsync({
     GoogleAuthController,
     GoogleGmailAuthController,
     VerifyAuthController,
+    OauthController,
   ],
   providers: [
     AuthService,

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { z } from 'zod';
@@ -52,6 +52,7 @@ export const useSignInUp = () => {
   const billing = useRecoilValue(billingState);
 
   const workspaceInviteHash = useParams().workspaceInviteHash;
+  const [searchParams, _] = useSearchParams();
   const [signInUpStep, setSignInUpStep] = useState<SignInUpStep>(
     SignInUpStep.Init,
   );
@@ -144,6 +145,13 @@ export const useSignInUp = () => {
           currentWorkspace.subscriptionStatus !== 'active'
         ) {
           navigate('/plan-required');
+          return;
+        }
+
+        console.log('toto');
+
+        if (searchParams.get('redirect_uri')) {
+          window.location.href = searchParams.get('redirect_uri');
           return;
         }
 

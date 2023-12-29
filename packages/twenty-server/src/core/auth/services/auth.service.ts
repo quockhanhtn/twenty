@@ -233,4 +233,25 @@ export class AuthService {
       },
     };
   }
+
+  validateClient(clientId: string, redirectUri: string): boolean {
+    return true;
+  }
+
+  generateAuthorizationCode(
+    clientId: string,
+    workspace: string,
+    scope: string,
+  ): string {
+    return '1243';
+  }
+
+  exchangeCodeForToken(
+    code: string,
+    redirectUri: string,
+    clientId: string,
+    clientSecret: string,
+  ): string {
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDIwMjAyMC0xYzI1LTRkMDItYmYyNS02YWVjY2Y3ZWE0MTkiLCJpYXQiOjE3MDMxNjgzMDEsImV4cCI6MTcwNDQ2NDMwMCwianRpIjoiODMwZTRlNTYtNjg4MS00NGZkLTkzYzctOGIwNTM5ZTczZDQwIn0.lnWXv07Q-H_7NwhHFe-f6b4UHrmOWEhYgzElVyevE0c';
+  }
 }
