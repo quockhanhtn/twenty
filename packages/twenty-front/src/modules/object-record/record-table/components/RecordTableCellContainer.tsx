@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
+import { isLabelIdentifierField } from '@/object-metadata/utils/isLabelIdentifierField';
 import { useRecordTableScopedStates } from '@/object-record/record-table/hooks/internal/useRecordTableScopedStates';
 import { getRecordTableScopeInjector } from '@/object-record/record-table/utils/getRecordTableScopeInjector';
 import { RelationPickerHotkeyScope } from '@/object-record/relation-picker/types/RelationPickerHotkeyScope';
@@ -70,9 +71,16 @@ export const RecordTableCellContainer = ({
               useUpdateRecord: () => [updateRecord, {}],
               hotkeyScope: customHotkeyScope,
               basePathToShowPage: objectMetadataConfig?.basePathToShowPage,
-              isLabelIdentifier:
-                columnDefinition.fieldMetadataId ===
-                objectMetadataConfig?.labelIdentifierFieldMetadataId,
+              isLabelIdentifier: isLabelIdentifierField({
+                fieldMetadataItem: {
+                  id: columnDefinition.fieldMetadataId,
+                  name: columnDefinition.metadata.fieldName,
+                },
+                objectMetadataItem: {
+                  labelIdentifierFieldMetadataId:
+                    objectMetadataConfig?.labelIdentifierFieldMetadataId,
+                },
+              }),
             }}
           >
             <RecordTableCell customHotkeyScope={{ scope: customHotkeyScope }} />

@@ -25,6 +25,7 @@ import { Table } from '@/ui/layout/table/components/Table';
 import { TableHeader } from '@/ui/layout/table/components/TableHeader';
 import { TableSection } from '@/ui/layout/table/components/TableSection';
 import { Breadcrumb } from '@/ui/navigation/bread-crumb/components/Breadcrumb';
+import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -36,8 +37,11 @@ export const SettingsObjectDetail = () => {
   const navigate = useNavigate();
 
   const { objectSlug = '' } = useParams();
-  const { disableObjectMetadataItem, findActiveObjectMetadataItemBySlug } =
-    useObjectMetadataItemForSettings();
+  const {
+    disableObjectMetadataItem,
+    editObjectMetadataItem,
+    findActiveObjectMetadataItemBySlug,
+  } = useObjectMetadataItemForSettings();
 
   const activeObjectMetadataItem =
     findActiveObjectMetadataItemBySlug(objectSlug);
@@ -63,10 +67,17 @@ export const SettingsObjectDetail = () => {
     navigate('/settings/objects');
   };
 
-  const handleDisableField = async (
+  const handleDisableField = (activeFieldMetadatItem: FieldMetadataItem) => {
+    disableMetadataField(activeFieldMetadatItem);
+  };
+
+  const handleSetLabelIdentifierField = (
     activeFieldMetadatItem: FieldMetadataItem,
   ) => {
-    disableMetadataField(activeFieldMetadatItem);
+    editObjectMetadataItem({
+      ...activeObjectMetadataItem,
+      labelIdentifierFieldMetadataId: activeFieldMetadatItem.id,
+    });
   };
 
   return (
@@ -99,29 +110,47 @@ export const SettingsObjectDetail = () => {
             </StyledObjectFieldTableRow>
             {!!activeMetadataFields.length && (
               <TableSection title="Active">
-                {activeMetadataFields.map((activeMetadataField) => (
-                  <SettingsObjectFieldItemTableRow
-                    key={activeMetadataField.id}
-                    fieldMetadataItem={activeMetadataField}
-                    ActionIcon={
-                      <SettingsObjectFieldActiveActionDropdown
-                        isCustomField={!!activeMetadataField.isCustom}
-                        scopeKey={activeMetadataField.id}
-                        onEdit={() =>
-                          navigate(`./${getFieldSlug(activeMetadataField)}`)
-                        }
-                        onDisable={
-                          isLabelIdentifierField({
-                            fieldMetadataItem: activeMetadataField,
-                            objectMetadataItem: activeObjectMetadataItem,
-                          })
-                            ? undefined
-                            : () => handleDisableField(activeMetadataField)
-                        }
-                      />
-                    }
-                  />
-                ))}
+                {activeMetadataFields.map((activeMetadataField) => {
+                  const isLabelIdentifier = isLabelIdentifierField({
+                    fieldMetadataItem: activeMetadataField,
+                    objectMetadataItem: activeObjectMetadataItem,
+                  });
+                  const canBeSetAsLabelIdentifier =
+                    activeObjectMetadataItem.isCustom &&
+                    !isLabelIdentifier &&
+                    [FieldMetadataType.Text, FieldMetadataType.Number].includes(
+                      activeMetadataField.type,
+                    );
+
+                  return (
+                    <SettingsObjectFieldItemTableRow
+                      key={activeMetadataField.id}
+                      fieldMetadataItem={activeMetadataField}
+                      ActionIcon={
+                        <SettingsObjectFieldActiveActionDropdown
+                          isCustomField={!!activeMetadataField.isCustom}
+                          scopeKey={activeMetadataField.id}
+                          onEdit={() =>
+                            navigate(`./${getFieldSlug(activeMetadataField)}`)
+                          }
+                          onSetAsLabelIdentifier={
+                            canBeSetAsLabelIdentifier
+                              ? () =>
+                                  handleSetLabelIdentifierField(
+                                    activeMetadataField,
+                                  )
+                              : undefined
+                          }
+                          onDisable={
+                            isLabelIdentifier
+                              ? undefined
+                              : () => handleDisableField(activeMetadataField)
+                          }
+                        />
+                      }
+                    />
+                  );
+                })}
               </TableSection>
             )}
             {!!disabledMetadataFields.length && (
